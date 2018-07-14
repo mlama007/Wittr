@@ -1,6 +1,7 @@
 import PostsView from './views/Posts';
 import ToastsView from './views/Toasts';
 import idb from 'idb';
+import { ENGINE_METHOD_ALL } from 'constants';
 
 function openDatabase() {
   // If the browser doesn't support service worker,
@@ -82,6 +83,12 @@ IndexController.prototype._showCachedMessages = function() {
     // in order of date, starting with the latest.
     // Remember to return a promise that does all this,
     // so the websocket isn't opened until you're done!
+    var index = db.transaction('wittrs')
+    .objectStore('wittrs').index('by-date');
+
+    return index.getAll().then(function(messages) {
+      indexController._postsView.addPosts(messages.reverse());
+    });
   });
 };
 
